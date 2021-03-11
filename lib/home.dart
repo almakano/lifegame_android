@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '1stPage.dart';
 import '2ndPage.dart';
+import '3rdPage.dart';
 
 class HomePage extends StatefulWidget {
   HomePage({Key key, this.title}) : super(key: key);
@@ -13,13 +14,11 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  TabController _tabcontroller;
   int _selectedIndex = 0;
 
   @override
   void initState() {
     super.initState();
-    _tabcontroller = new TabController(length: 2, vsync: null);
   }
 
   void _onNavTapped(int index) {
@@ -28,24 +27,26 @@ class _HomePageState extends State<HomePage> {
     });
   }
 
-  Widget getNavBody(int index) {
+  getNavBody(int index) {
     setState(() {});
     if (index == 0) return FirstPage();
     if (index == 1) return SecondPage();
+    if (index == 2) return ThirdPage();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Container(
-        margin: EdgeInsets.only(top: MediaQuery.of(context).padding.top),
-        child: getNavBody(_selectedIndex),
-      ),
+      body: getNavBody(_selectedIndex),
       bottomNavigationBar: BottomNavigationBar(
         items: [
           BottomNavigationBarItem(
             icon: Icon(Icons.home),
-            label: 'Домой',
+            label: 'Графики',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.money),
+            label: 'Финансы',
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.settings),

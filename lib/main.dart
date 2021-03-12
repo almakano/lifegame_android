@@ -4,19 +4,19 @@ import 'package:flutter/services.dart';
 import 'home.dart';
 
 void main() {
-  SystemChrome.setEnabledSystemUIOverlays([]);
   runApp(MyApp());
 }
 
 class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+    SystemChrome.setEnabledSystemUIOverlays([SystemUiOverlay.bottom]);
     return MaterialApp(
-      title: 'LifeGame',
+      title: 'LifeSim',
       theme: ThemeData(
         primarySwatch: Colors.blueGrey,
       ),
-      home: HomePage(title: 'LifeGame'),
+      home: HomePage(title: 'LifeSim'),
     );
   }
 }

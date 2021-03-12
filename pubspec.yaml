@@ -1,5 +1,5 @@
 name: lifesimulator
-description: A new Flutter project.
+description: simulate the future
 
 publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 
@@ -11,9 +11,9 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  universal_html: ^1.2.1
-
   cupertino_icons: ^1.0.1
+  http: ^0.13.0
+  universal_html: ^1.2.1
 
 dev_dependencies:
   flutter_test:

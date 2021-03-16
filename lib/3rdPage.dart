@@ -9,7 +9,7 @@ class ThirdPage extends StatefulWidget {
 }
 
 class _ThirdPageState extends State<ThirdPage> {
-  Map<String, dynamic> data;
+  List<dynamic> data;
 
   Future fetchData() async {
     final response =
@@ -31,9 +31,9 @@ class _ThirdPageState extends State<ThirdPage> {
   Widget build(BuildContext context) {
     return Scaffold(
         body: ListView.builder(
-            itemCount: data != null ? data.length : 0,
+            itemCount: data != null ? (data as Map).length : 0,
             itemBuilder: (BuildContext context, int index) {
-              final item = data.values.elementAt(index);
+              final item = (data as Map).values.elementAt(index);
               return Column(children: [
                 CheckboxListTile(
                   title: Text(item['title']),

@@ -12,7 +12,9 @@ dependencies:
   flutter:
     sdk: flutter
   cupertino_icons: ^1.0.1
+  flutter_socketio_feathersjs: ^0.0.8
   http: ^0.13.0
+  path: ^1.8.0
   universal_html: ^1.2.1
 
 dev_dependencies:

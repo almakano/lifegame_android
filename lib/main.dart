@@ -18,7 +18,7 @@ class App extends StatelessWidget {
   static var me;
   static String token;
   static String cookie;
-  static String endPoint = 'https://lifesim.makano.pp.ua/';
+  static String endPoint = 'https://lifesim.makano.pp.ua';
   static SocketIO socketChat;
   static bool isLog = true;
 
@@ -48,41 +48,32 @@ class RequestTask {
       headers[HttpHeaders.cookieHeader] = App.cookie;
     }
 
-    DateTime time1 = DateTime.now();
+    debugPrint(App.endPoint);
+    var time1 = DateTime.now();
+    var response =
+        await http.get(Uri.parse(App.endPoint + url), headers: headers);
+    var time2 = DateTime.now().difference(time1);
 
-    try {
-      HttpClient client = new HttpClient();
-      return client
-          .getUrl(Uri.parse(App.endPoint + url))
-          .then((HttpClientRequest request) {
-        headers.forEach((k, i) {
-          request.headers.add(k, i);
-        });
-        return request.close();
-      }).then((HttpClientResponse response) {
-        if (response.cookies != null) {
-          App.cookie = response.cookies as String;
-        }
+    String rawCookie = response.headers['set-cookie'];
+    if (rawCookie != null) {
+      int index = rawCookie.indexOf(';');
+      App.cookie = (index == -1) ? rawCookie : rawCookie.substring(0, index);
+    }
 
-        var time2 = DateTime.now().difference(time1);
-
-        if (App.isLog)
-        // debugPrint("GET ${App.endPoint + url}: ${response.statusCode} ${time2}s ${response.body}");
-        if (response.statusCode == 200) {
-          try {
-            var res = json.decode(response.toString());
-            return res;
-          } on Exception catch (e) {
-            debugPrint("GET: $e");
-          }
-        }
-      });
-    } catch (e) {
-      debugPrint("GET: $e");
+    if (App.isLog)
+      debugPrint(
+          "GET ${App.endPoint + url}: ${response.statusCode} ${time2}s ${response.body}");
+    if (response.statusCode == 200) {
+      try {
+        var res = (new JsonDecoder()).convert(response.body);
+        return res;
+      } on Exception catch (e) {
+        debugPrint("GET: $e");
+      }
     }
   }
 
-  static Future<dynamic> post(String url,
+  static dynamic post(String url,
       {Map<String, String> headers, body, encoding}) async {
     if (headers == null) {
       headers = new Map();
@@ -93,37 +84,32 @@ class RequestTask {
     }
     DateTime time1 = DateTime.now();
 
-    try {
-      return http
-          .post(App.endPoint + url,
-              body: body, headers: headers, encoding: encoding)
-          .then((http.Response response) {
-        if (response.headers['set-cookie'] != null) {
-          App.cookie = response.headers['set-cookie'];
-        }
-
-        final String res = response.body;
-
-        var time2 = DateTime.now().difference(time1);
-
-        if (App.isLog)
-          debugPrint(
-              "POST ${App.endPoint + url}: ${response.statusCode} ${time2}s ${response.body}");
-        if (response.statusCode == 200) {
-          try {
-            final json = (new JsonDecoder()).convert(res);
-            return json;
-          } on Exception catch (e) {
-            debugPrint("POST: $e");
-          }
-        }
-      });
-    } catch (e) {
-      debugPrint("POST: $e");
+    http.Response response = await http.post(Uri.parse(App.endPoint + url),
+        body: body, headers: headers);
+    if (response.headers['set-cookie'] != null) {
+      App.cookie = response.headers['set-cookie'];
     }
+
+    final String res = response.body;
+
+    var time2 = DateTime.now().difference(time1);
+
+    if (App.isLog)
+      debugPrint(
+          "POST ${App.endPoint + url}: ${response.statusCode} ${time2}s ${response.body}");
+    if (response.statusCode == 200) {
+      try {
+        final json = (new JsonDecoder()).convert(res);
+        return json;
+      } on Exception catch (e) {
+        debugPrint("POST: $e");
+      }
+    }
+
+    return response;
   }
 
-  static Future<dynamic> upload(String url, List<File> files) async {
+  static dynamic upload(String url, List<File> files) async {
     var headers = {HttpHeaders.userAgentHeader: "android"};
     if (App.token != null) {
       headers[HttpHeaders.authorizationHeader] = "Basic " + App.token;
@@ -131,16 +117,15 @@ class RequestTask {
     DateTime time1 = DateTime.now();
 
     try {
-      var multipartFiles = List(files.length);
-      for (int i = 0; i < files.length; i++) {
-        var len = await files[i].length();
-        multipartFiles.add(http.MultipartFile("files", files[i].openRead(), len,
-            filename: basename(files[i].path)));
-      }
       var request =
           http.MultipartRequest("POST", Uri.parse(App.endPoint + url));
       request.headers.addAll(headers);
-      request.files.addAll(multipartFiles);
+
+      for (int i = 0; i < files.length; i++) {
+        var len = await files[i].length();
+        request.files.add(http.MultipartFile("files", files[i].openRead(), len,
+            filename: basename(files[i].path)));
+      }
 
       var response = await http.Response.fromStream(await request.send());
       var time2 = DateTime.now().difference(time1);

@@ -1,7 +1,5 @@
-import 'dart:convert';
-
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
+import 'main.dart';
 
 class ThirdPage extends StatefulWidget {
   @override
@@ -9,16 +7,10 @@ class ThirdPage extends StatefulWidget {
 }
 
 class _ThirdPageState extends State<ThirdPage> {
-  List<dynamic> data;
+  var data;
 
-  Future fetchData() async {
-    final response =
-        await http.get(Uri.parse('https://lifesim.makano.pp.ua/data/settings'));
-    if (response.statusCode == 200) {
-      data = json.decode(response.body);
-    } else {
-      throw Exception('Failed to load settings');
-    }
+  void fetchData() {
+    data = RequestTask.get('/data/settings');
   }
 
   @override
